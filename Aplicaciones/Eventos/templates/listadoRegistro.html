@@ -1,0 +1,33 @@
+{% extends "./plantilla.html" %}
+{% block body %}
+    <h1>REGISTROS DE PARTICIPANTES</h1>
+    <br>
+    
+    <!-- Tabla para mostrar los registros de los participantes -->
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Participante</th>
+                <th>Email</th>
+                <th>Evento</th>
+                <th>Fecha de Registro</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for registro in registros %}
+            <tr>
+                <td>{{ registro.nombre_participante }}</td>
+                <td>{{ registro.email }}</td>
+                <td>{{ registro.evento.titulo }}</td>
+                <td>{{ registro.registrado_en }}</td>
+                <td>
+                    <a href="/editarRegistro/{{ registro.id }}" class="btn btn-warning">Editar</a>
+                    <a href="/eliminarRegistro/{{ registro.id }}" class="btn btn-danger">Eliminar</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

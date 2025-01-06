@@ -1,0 +1,31 @@
+{% extends "./plantilla.html" %}
+{% block title %} Editar Registro {% endblock %}
+{% block body %}
+
+    <div class="row">
+        <div class="col-md-3">
+        </div>
+        <div class="col-md-6">
+            <h1>EDITAR REGISTRO</h1> 
+            <br>
+            <form action="{% url 'procesarEdicionRegistro' %}" method="post">
+                {% csrf_token %}
+                
+                <!-- Campo oculto para enviar el ID del registro -->
+                <input type="hidden" name="id" id="id" value="{{ registroEditar.id }}">
+                
+                <!-- Nombre del participante -->
+                <label for="nombre_participante">Nombre del Participante:</label>
+                <input type="text" name="nombre_participante" id="nombre_participante" value="{{ registroEditar.nombre_participante }}" class="form-control" placeholder="Nombre del Participante" required>
+
+                <!-- Correo electrónico del participante -->
+                <label for="email">Correo Electrónico:</label>
+                <input type="email" name="email" id="email" value="{{ registroEditar.email }}" class="form-control" placeholder="Correo Electrónico" required>
+
+                <!-- Botón para guardar los cambios -->
+                <button type="submit" class="btn btn-primary mt-3">Guardar Cambios</button>
+            </form>
+        </div>
+    </div>
+
+{% endblock %}

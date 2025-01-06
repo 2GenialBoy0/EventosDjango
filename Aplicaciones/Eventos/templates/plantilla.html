@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Eventos y Registros</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            
+            $('#btnGestionEventos').click(function() {
+                $('#gestionEventos').show();
+                $('#listadoEventos').show();
+                $('#gestionRegistros').hide();
+                $('#listadoRegistros').hide();
+            });
+
+            $('#btnGestionRegistros').click(function() {
+                $('#gestionRegistros').show();
+                $('#listadoRegistros').show();
+                $('#gestionEventos').hide();
+                $('#listadoEventos').hide();
+            });
+
+            
+            $('.btn-editar-evento').click(function() {
+                const evento = $(this).data('evento');
+                $('#titulo').val(evento.titulo);
+                $('#descripcion').val(evento.descripcion);
+                $('#categoria').val(evento.categoria);
+                $('#fecha').val(evento.fecha);
+                $('#hora').val(evento.hora);
+                $('#ubicacion').val(evento.ubicacion);
+                $('#estado').val(evento.estado);
+                $('#formGestionEventos').attr('action', evento.url_editar); 
+            });
+
+            $('.btn-editar-registro').click(function() {
+                const registro = $(this).data('registro');
+                $('#nombre_participante').val(registro.nombre_participante);
+                $('#email').val(registro.email);
+                $('#evento').val(registro.evento_id);
+                $('#formGestionRegistros').attr('action', registro.url_editar); 
+            });
+
+            
+            $('#gestionEventos').show();
+            $('#listadoEventos').show();
+            $('#gestionRegistros').hide();
+            $('#listadoRegistros').hide();
+        });
+    </script>
+</head>
+<body class="container">
+
+ 
+    <header class="bg-primary text-white text-center py-4">
+        <h1>Gestión de Eventos y Registros</h1>
+    </header>
+
+ 
+    <div class="my-4 text-center">
+        <button id="btnGestionEventos" class="btn btn-secondary">Gestión de Eventos</button>
+        <button id="btnGestionRegistros" class="btn btn-secondary">Gestión de Registros</button>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="row">
+        <!-- Gestión de Eventos -->
+        <div class="col-md-6" id="gestionEventos" style="display: none;">
+            <h2>Gestión de Eventos</h2>
+            <form id="formGestionEventos" method="POST" action="{% url 'guardar_evento' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="titulo">Título:</label>
+                    <input type="text" id="titulo" name="titulo" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="descripcion">Descripción:</label>
+                    <textarea id="descripcion" name="descripcion" class="form-control" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="categoria">Categoría:</label>
+                    <input type="text" id="categoria" name="categoria" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="fecha">Fecha:</label>
+                    <input type="date" id="fecha" name="fecha" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="hora">Hora:</label>
+                    <input type="time" id="hora" name="hora" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="ubicacion">Ubicación:</label>
+                    <input type="text" id="ubicacion" name="ubicacion" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="estado">Estado:</label>
+                    <select id="estado" name="estado" class="form-control" required>
+                        <option value="activo">Activo</option>
+                        <option value="inactivo">Inactivo</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Guardar Evento</button>
+            </form>
+        </div>
+
+        <!-- Listado de Eventos -->
+        <div class="col-md-6" id="listadoEventos" style="display: none;">
+            <h2>Lista de Eventos</h2>
+            <ul class="list-group">
+                {% for evento in Eventos %}
+                <li class="list-group-item">
+                    <strong>{{ evento.titulo }}</strong> - {{ evento.fecha }} {{ evento.hora }}
+                    <br>Ubicación: {{ evento.ubicacion }}
+                    <br>Estado: {{ evento.estado }}
+                    <br>
+                    <button class="btn btn-warning btn-sm btn-editar-evento" 
+                        data-evento='{"titulo": "{{ evento.titulo }}", "descripcion": "{{ evento.descripcion }}", "categoria": "{{ evento.categoria }}", "fecha": "{{ evento.fecha }}", "hora": "{{ evento.hora }}", "ubicacion": "{{ evento.ubicacion }}", "estado": "{{ evento.estado }}", "url_editar": "{% url 'procesarEdicionEvento' evento.id %}"}'>
+                        Editar
+                    </button>
+
+                    <form method="POST" action="{% url 'eliminar_evento' evento.id %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <!-- Gestión de Registros -->
+        <div class="col-md-6" id="gestionRegistros" style="display: none;">
+            <h2>Gestión de Registros</h2>
+            <form id="formGestionRegistros" method="POST" action="{% url 'guardarRegistro' %}">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label for="evento">Evento:</label>
+                    <select id="evento" name="evento" class="form-control" required>
+                        {% for evento in Eventos %}
+                        <option value="{{ evento.id }}">{{ evento.titulo }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="nombre_participante">Nombre del Participante:</label>
+                    <input type="text" id="nombre_participante" name="nombre_participante" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" id="email" name="email" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Guardar Registro</button>
+            </form>
+        </div>
+
+        <!-- Listado de Registros -->
+        <div class="col-md-6" id="listadoRegistros" style="display: none;">
+            <h2>Lista de Registros</h2>
+            <ul class="list-group">
+                {% for registro in Registros %}
+                <li class="list-group-item">
+                    <strong>{{ registro.nombre_participante }}</strong> - {{ registro.email }}
+                    <br>Evento: {{ registro.evento.titulo }}
+                    <br>Registrado en: {{ registro.registrado_en }}
+                    <br>
+                    <button class="btn btn-warning btn-sm btn-editar-registro" 
+                            data-registro='{"nombre_participante": "{{ registro.nombre_participante }}", "email": "{{ registro.email }}", "evento_id": "{{ registro.evento.id }}", "url_editar": "{% url 'procesarEdicionRegistro' registro.id %}"}'>
+                        Editar
+                    </button>
+                    <form method="POST" action="{% url 'eliminarRegistro' registro.id %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                    </form>
+                </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Pie de página -->
+    <footer class="bg-dark text-white text-center py-4">
+        <p>&copy; 2025 Genial Boy Company</p>
+    </footer>
+
+</body>
+</html>
